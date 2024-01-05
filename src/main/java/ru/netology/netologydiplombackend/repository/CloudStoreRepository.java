@@ -11,6 +11,7 @@ import ru.netology.netologydiplombackend.model.file.FileInfo;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -61,11 +62,11 @@ public class CloudStoreRepository {
     }
 
     public String getPassword(String login) {
-        log.debug("!!!getPassword for login: {}", login);
+        log.debug("getPassword for login: {}", login);
         List<Map<String, Object>> sqlResult = jdbcTemplate.queryForList(SQL_SELECT_PASSWORD, login);
         if (sqlResult.size() == 1) {
             //TODO лучше хранить пароль в зашифрованном виде
-            return sqlResult.get(0).containsKey("password") ? sqlResult.get(0).get("password").toString() : null;
+            return sqlResult.get(0).containsKey("PASSWORD") ? sqlResult.get(0).get("PASSWORD").toString() : null;
         }
         else return null;
     }
@@ -108,6 +109,9 @@ public class CloudStoreRepository {
     }
 
     public void uploadFile(String login, String filename, MultipartFile file) throws IOException {
+        if (file == null) {
+            throw  new RuntimeException("file is empty");
+        }
         String data = Base64.getEncoder().encodeToString(file.getBytes());
         jdbcTemplate.update(SQL_INSERT_FILE, login, filename, data, file.getSize());
     }
