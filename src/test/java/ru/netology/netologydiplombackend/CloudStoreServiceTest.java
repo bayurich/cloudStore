@@ -1,11 +1,8 @@
 package ru.netology.netologydiplombackend;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -21,7 +18,6 @@ import ru.netology.netologydiplombackend.service.TokenService;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -61,7 +57,7 @@ public class CloudStoreServiceTest {
 
         Login login = new Login("user", "password");
         Token token = cloudStoreService.login(login);
-        assertEquals("generate_token_value", token.getToken());
+        assertEquals("generate_token_value", token.getTokenValue());
     }
 
     @Test

@@ -46,7 +46,7 @@ public class CloudStoreService {
     }
 
     public void logout(String token) {
-        //TODO сначала проверить, что за токен, правильный ли, прежде чем удалять????
+        String login = getLoginByToken(token);
 
         cloudStoreRepository.deleteToken(getRawToken(token));
     }

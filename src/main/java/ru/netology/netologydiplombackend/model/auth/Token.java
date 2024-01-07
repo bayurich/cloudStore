@@ -4,24 +4,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Token {
     @JsonProperty(value = "auth-token")
-    String token;
+    String tokenValue;
 
-    public Token(String token) {
-        this.token = token;
+    public Token() {
     }
 
-    public String getToken() {
-        return token;
+    public Token(String tokenValue) {
+        this.tokenValue = tokenValue;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public String getTokenValue() {
+        return tokenValue;
+    }
+
+    public void setTokenValue(String tokenValue) {
+        this.tokenValue = tokenValue;
     }
 
     @Override
     public String toString() {
         return "Token{" +
-                "token='" + token + '\'' +
+                "tokenValue='" + tokenValue + '\'' +
                 '}';
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 public class CloudStoreController {
     CloudStoreService cloudStoreService;
 
-    private static final Logger LOG = LoggerFactory.getLogger(CloudStoreController.class);
+    private static final Logger log = LoggerFactory.getLogger(CloudStoreController.class);
 
     public CloudStoreController(CloudStoreService cloudStoreService) {
         this.cloudStoreService = cloudStoreService;
@@ -26,14 +26,14 @@ public class CloudStoreController {
 
     @PostMapping("/login")
     public Token login(@RequestBody Login login) {
-        LOG.info("Start endpoint [POST] [login] with login: {}", login != null ? login.getLogin(): "");
+        log.info("Start endpoint [POST] [login] with login: {}", login != null ? login.getLogin(): "");
 
         return cloudStoreService.login(login);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("auth-token") @NotBlank String token) {
-        LOG.info("Start endpoint POST logout with token: {}", token);
+        log.info("Start endpoint POST logout with token: {}", token);
         cloudStoreService.logout(token);
 
         return new ResponseEntity<>("Success logout", HttpStatus.OK);
@@ -43,7 +43,7 @@ public class CloudStoreController {
     @GetMapping("/list")
     public List<FileInfo> getFiles(@RequestHeader("auth-token") @NotBlank String token,
                                    @RequestParam("limit") int limit) {
-        LOG.info("Start endpoint GET list with token: {} limit: {}", token, limit);
+        log.info("Start endpoint GET list with token: {} limit: {}", token, limit);
 
         return cloudStoreService.getFiles(token, limit);
     }
@@ -51,8 +51,8 @@ public class CloudStoreController {
     @PostMapping("/file")
     public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") @NotBlank String token,
                                              @RequestParam("filename") String filename,
-                                             MultipartFile file) {
-        LOG.info("Start endpoint POST file with token: {} filename: {}", token, filename);
+                                             @RequestParam("file") MultipartFile file) {
+        log.info("Start endpoint POST file with token: {} filename: {}", token, filename);
         cloudStoreService.uploadFile(token, filename, file);
 
         return new ResponseEntity<>("Success upload", HttpStatus.OK);
@@ -61,7 +61,7 @@ public class CloudStoreController {
     @DeleteMapping("/file")
     public ResponseEntity<String> deleteFile(@RequestHeader("auth-token") @NotBlank String token,
                                              @RequestParam("filename") String filename) {
-        LOG.info("Start endpoint DELETE file with token: {} filename: {}", token, filename);
+        log.info("Start endpoint DELETE file with token: {} filename: {}", token, filename);
         cloudStoreService.deleteFile(token, filename);
 
         return new ResponseEntity<>("Success deleted", HttpStatus.OK);
@@ -70,10 +70,9 @@ public class CloudStoreController {
     @GetMapping("/file")
     public ResponseEntity<byte[]> downloadFile(@RequestHeader("auth-token") @NotBlank String token,
                                              @RequestParam("filename") String filename) {
-        LOG.info("Start endpoint GET file with token: {} filename: {}", token, filename);
+        log.info("Start endpoint GET file with token: {} filename: {}", token, filename);
 
         byte[] result = cloudStoreService.downloadFile(token, filename);
-        LOG.info("!!!!!!!!!!!!!!! result: {}", result);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -81,7 +80,7 @@ public class CloudStoreController {
     public ResponseEntity<String> renameFile(@RequestHeader("auth-token") @NotBlank String token,
                                              @RequestParam("filename") String currentFileName,
                                              @RequestBody FileInfo newFileInfo) {
-        LOG.info("Start endpoint PUT file with token: {} filename: {}", token, currentFileName);
+        log.info("Start endpoint PUT file with token: {} filename: {}", token, currentFileName);
         cloudStoreService.renameFile(token, currentFileName, newFileInfo);
 
         return new ResponseEntity<>("Success rename", HttpStatus.OK);
