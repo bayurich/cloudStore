@@ -1,0 +1,2 @@
+important:
+Start Docker before running CloudStoreControllerTest

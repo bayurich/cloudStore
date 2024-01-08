@@ -80,7 +80,11 @@ public class CloudStoreServiceTest {
     public void logout_Ok_Test() {
         Mockito.reset(cloudStoreRepository);
 
-        cloudStoreService.logout("token");
+        //auth
+        Mockito.when(tokenService.getLogin(correctRawToken)).thenReturn(correctLogin);
+        Mockito.when(cloudStoreRepository.isFindToken(correctRawToken)).thenReturn(true);
+
+        cloudStoreService.logout(correctRawToken);
         assertTrue(true);
     }
 

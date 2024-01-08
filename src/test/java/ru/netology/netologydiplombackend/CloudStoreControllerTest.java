@@ -9,7 +9,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.multipart.MultipartFile;
 import ru.netology.netologydiplombackend.model.auth.Login;
 import ru.netology.netologydiplombackend.model.auth.Token;
 import ru.netology.netologydiplombackend.model.file.FileInfo;
