@@ -91,7 +91,7 @@ public class CloudStoreServiceTest {
 
         //auth
         Mockito.when(tokenService.getLogin(correctRawToken)).thenReturn(correctLogin);
-        Mockito.when(cloudStoreRepository.findToken(correctRawToken)).thenReturn(true);
+        Mockito.when(cloudStoreRepository.isFindToken(correctRawToken)).thenReturn(true);
         //getFiles
         List<FileInfo> expectedFileInfoList = new ArrayList<>();
         expectedFileInfoList.add(new FileInfo("file1.txt", 11111L));
@@ -124,7 +124,7 @@ public class CloudStoreServiceTest {
 
         //auth
         Mockito.when(tokenService.getLogin(correctRawToken)).thenReturn(correctLogin);
-        Mockito.when(cloudStoreRepository.findToken(correctRawToken)).thenReturn(true);
+        Mockito.when(cloudStoreRepository.isFindToken(correctRawToken)).thenReturn(true);
 
         File file = new File("src/test/resources/file.txt");
         FileInputStream fis = new FileInputStream(file);
@@ -140,7 +140,7 @@ public class CloudStoreServiceTest {
 
         //auth
         Mockito.when(tokenService.getLogin(correctRawToken)).thenReturn(correctLogin);
-        Mockito.when(cloudStoreRepository.findToken(correctRawToken)).thenReturn(true);
+        Mockito.when(cloudStoreRepository.isFindToken(correctRawToken)).thenReturn(true);
         //downloadFile
         File file = new File("src/test/resources/file.txt");
         byte[] bytes = Files.readAllBytes(file.toPath());
@@ -157,7 +157,7 @@ public class CloudStoreServiceTest {
 
         //auth
         Mockito.when(tokenService.getLogin(correctRawToken)).thenReturn(correctLogin);
-        Mockito.when(cloudStoreRepository.findToken(correctRawToken)).thenReturn(true);
+        Mockito.when(cloudStoreRepository.isFindToken(correctRawToken)).thenReturn(true);
 
         FileInfo fileInfo = new FileInfo("new.txt", 1234L);
         cloudStoreService.renameFile(correctToken, "file.txt", fileInfo);
@@ -183,7 +183,7 @@ public class CloudStoreServiceTest {
 
         //auth
         Mockito.when(tokenService.getLogin(correctRawToken)).thenReturn(correctLogin);
-        Mockito.when(cloudStoreRepository.findToken(correctRawToken)).thenReturn(true);
+        Mockito.when(cloudStoreRepository.isFindToken(correctRawToken)).thenReturn(true);
 
         InputDataException inputDataException = assertThrows(InputDataException.class, () -> {
             cloudStoreService.renameFile(correctToken, "file.txt", null);
@@ -198,7 +198,7 @@ public class CloudStoreServiceTest {
 
         //auth
         Mockito.when(tokenService.getLogin(correctRawToken)).thenReturn(correctLogin);
-        Mockito.when(cloudStoreRepository.findToken(correctRawToken)).thenReturn(true);
+        Mockito.when(cloudStoreRepository.isFindToken(correctRawToken)).thenReturn(true);
 
         cloudStoreService.deleteFile(correctToken, "file.txt");
         assertTrue(true);

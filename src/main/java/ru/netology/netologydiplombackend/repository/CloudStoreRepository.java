@@ -7,11 +7,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
+import ru.netology.netologydiplombackend.exception.InputDataException;
 import ru.netology.netologydiplombackend.model.file.FileInfo;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -62,7 +62,8 @@ public class CloudStoreRepository {
     }
 
     public String getPassword(String login) {
-        log.debug("getPassword for login: {}", login);
+        log.debug("start getPassword for login: {}", login);
+
         List<Map<String, Object>> sqlResult = jdbcTemplate.queryForList(SQL_SELECT_PASSWORD, login);
         if (sqlResult.size() == 1) {
             //TODO лучше хранить пароль в зашифрованном виде
@@ -72,20 +73,28 @@ public class CloudStoreRepository {
     }
 
     public void addToken(String token) {
+        log.debug("start addToken token: {}", token);
+
         jdbcTemplate.update(SQL_INSERT_TOKEN, token);
     }
 
     public void deleteToken(String token) {
+        log.debug("start deleteToken token: {}", token);
+
         jdbcTemplate.update(SQL_DELETE_TOKEN, token);
     }
 
-    public boolean findToken(String token) {
+    public boolean isFindToken(String token) {
+        log.debug("start isFindToken token: {}", token);
+
         int count = jdbcTemplate.queryForObject(SQL_SELECT_COUNT_TOKEN, Integer.class, token);
+        log.debug("isFindToken count: {}", count);
         return count > 0;
     }
 
     public List<FileInfo> getFiles(String login, long limit) {
         log.debug("start getFiles: login: {} limit: {}", login, limit);
+
         List<FileInfo> fileInfoList = new ArrayList<>();
         try {
             List<Map<String, Object>> sqlResult = jdbcTemplate.queryForList(SQL_SELECT_FILES_BY_LOGIN, login, limit);
@@ -98,26 +107,32 @@ public class CloudStoreRepository {
                     fileInfoList.add(new FileInfo(filename, size));
                 });
             }
-            log.debug("getFiles: fileInfoList: {}", fileInfoList);
         }
         catch (Exception e) {
             log.error("getFiles: error while getting files: {}", e);
             throw new RuntimeException("Error getting file list");
         }
 
+        log.debug("end getFiles: fileInfoList: {}", fileInfoList);
         return fileInfoList;
     }
 
     public void uploadFile(String login, String filename, MultipartFile file) throws IOException {
+        log.debug("start uploadFile: login: {} filename: {}", login, filename);
+
         if (file == null) {
-            throw  new RuntimeException("file is empty");
+            throw  new InputDataException("file is empty");
         }
         String data = Base64.getEncoder().encodeToString(file.getBytes());
+        log.debug("uploadFile: file data: {}", data);
         jdbcTemplate.update(SQL_INSERT_FILE, login, filename, data, file.getSize());
     }
 
     public byte[] downloadFile(String login, String filename) {
+        log.debug("start downloadFile: login: {} filename: {}", login, filename);
+
         List<Map<String, Object>> sqlResult = jdbcTemplate.queryForList(SQL_SELECT_FILE_BY_LOGIN_AND_FILENAME, login, filename);
+        log.debug("downloadFile: sqlResult: {}", sqlResult);
         if (sqlResult.size() == 1) {
             Object data = sqlResult.get(0).get("DATA");
             return data != null ? Base64.getDecoder().decode(data.toString()) : null;
@@ -126,10 +141,14 @@ public class CloudStoreRepository {
     }
 
     public void renameFile(String login, String filename, String newFilename) {
+        log.debug("start renameFile: login: {} filename: {} newFilename: {}", login, filename, newFilename);
+
         jdbcTemplate.update(SQL_UPDATE_FILE, newFilename, login, filename);
     }
 
     public void deleteFile(String login, String filename) {
+        log.debug("start deleteFile: login: {} filename: {}", login, filename);
+
         jdbcTemplate.update(SQL_DELETE_FILE, login, filename);
     }
 }

@@ -3,9 +3,9 @@ package ru.netology.netologydiplombackend.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecureDigestAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.netology.netologydiplombackend.exception.InvalidCredentialsException;
@@ -18,12 +18,14 @@ import java.util.Date;
 //@ConfigurationProperties("jwt")
 public class TokenService {
 
-    private final static String TOKEN_SUBJECT = "userInfo";
-    private final static String TOKEN_ISSUER = "cloudStore";
-    private final static String TOKEN_CLAIM_LOGIN = "login";
+    private static final Logger log = LoggerFactory.getLogger(TokenService.class);
 
-    private SecretKey secretKey;
-    private JwtParser jwtParser;
+    private static final String TOKEN_SUBJECT = "userInfo";
+    private static final String TOKEN_ISSUER = "cloudStore";
+    private static final String TOKEN_CLAIM_LOGIN = "login";
+
+    private final SecretKey secretKey;
+    private final JwtParser jwtParser;
 
     @Value("${jwt.expiration}")
     private Duration expiration;
@@ -39,18 +41,11 @@ public class TokenService {
     }
 
     public String generateToken(String login) {
+        log.info("start generateToken: for login: {}", login);
 
-        //System.out.println("=================== secret: " + secret);
-        System.out.println("=================== secretKey: " + secretKey);
         Date now = new Date();
-        System.out.println("=================== now: " + now);
-        System.out.println("=================== expiration: " + expiration);
         Date expirationDate = new Date(now.getTime() + expiration.toMillis());
-        //Date expirationDate = now;
-        System.out.println("=================== expirationDate: " + expirationDate);
-
-        //Claims claims = Jwts.claims().build().;
-        //claims.cput(TOKEN_CLAIM_LOGIN, login);
+        log.debug("generateToken: login: {} expirationDate: {}", login, expirationDate);
 
         return Jwts.builder()
                 .issuer(TOKEN_ISSUER)
@@ -65,19 +60,24 @@ public class TokenService {
     public String getLogin(String token) {
         Claims claims = getClaims(token);
         if (claims == null) {
+            log.error("getLogin: claims is null for token: {}", token);
             throw new InvalidCredentialsException("Claims is null");
         }
         if (!TOKEN_ISSUER.equals(claims.getIssuer())) {
+            log.error("getLogin: incorrect issuer: {} for token: {}", claims.getIssuer(), token);
             throw new InvalidCredentialsException("Incorrect issuer: " + claims.getIssuer());
         }
         if (!TOKEN_SUBJECT.equals(claims.getSubject())) {
+            log.error("getLogin: incorrect subject: {} for token: {}", claims.getSubject(), token);
             throw new InvalidCredentialsException("Incorrect subject: " + claims.getSubject());
         }
         if (new Date().after(claims.getExpiration())) {
+            log.error("getLogin: is expire at: {} for token: {}", claims.getExpiration(), token);
             throw new InvalidCredentialsException("Token is expire at " + claims.getExpiration());
         }
         Object login = claims.get(TOKEN_CLAIM_LOGIN);
         if (login == null) {
+            log.error("getLogin: incorrect claim: {} is null for token: {}", TOKEN_CLAIM_LOGIN, token);
             throw new InvalidCredentialsException("Incorrect claim: " + TOKEN_CLAIM_LOGIN + " is null");
         }
         return login.toString();
@@ -88,7 +88,7 @@ public class TokenService {
             return jwtParser.parseSignedClaims(token).getPayload();
         }
         catch (Exception e) {
-            System.out.println("validateToken: error: " + e);
+            log.error("getClaims: error while validate token: {} {}", token, e);
             throw new InvalidCredentialsException(e.getMessage());
         }
     }

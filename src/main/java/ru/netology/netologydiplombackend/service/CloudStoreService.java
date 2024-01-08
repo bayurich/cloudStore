@@ -27,26 +27,33 @@ public class CloudStoreService {
     }
 
     public Token login(Login login) {
-
+        if (login == null) {
+            log.error("login: Login is null");
+            throw new InputDataException("Error input data");
+        }
         String userLogin = login.getLogin();
+        log.info("login: for login: {}", userLogin);
+
         String password = cloudStoreRepository.getPassword(userLogin);
         if (password == null) {
-            log.error("Unknown login: {}", userLogin);
+            log.error("login: Unknown login: {}", userLogin);
             throw new InvalidCredentialsException("Bad credentials");
         }
         if (!password.equals(login.getPassword())) {
-            log.error("Incorrect password [{}] for login: {}", login.getPassword(), login);
+            log.error("login: Incorrect password [{}] for login: {}", login.getPassword(), login);
             throw new InvalidCredentialsException("Bad credentials");
         }
 
         String token = tokenService.generateToken(userLogin);
-        log.debug("generate token: {}", token);
+        log.debug("login: generated token: {}", token);
         cloudStoreRepository.addToken(token);
+
         return new Token(token);
     }
 
     public void logout(String token) {
         String login = getLoginByToken(token);
+        log.info("logout: for login: {}", login);
 
         cloudStoreRepository.deleteToken(getRawToken(token));
     }
@@ -54,14 +61,17 @@ public class CloudStoreService {
 
     public List<FileInfo> getFiles(String token, int limit) {
         String login = getLoginByToken(token);
+        log.info("getFiles: for login: {}", login);
 
         return cloudStoreRepository.getFiles(login, limit);
     }
 
     public void uploadFile(String token, String filename, MultipartFile file) {
         String login = getLoginByToken(token);
+        log.info("uploadFile: for login: {}", login);
 
         if (file == null) {
+            log.error("uploadFile: MultipartFile is null");
             throw new InputDataException("Error input data");
         }
         //TODO добавить проверку на размер файла
@@ -72,15 +82,17 @@ public class CloudStoreService {
             cloudStoreRepository.uploadFile(login, filename, file);
         }
         catch (Exception e) {
-            log.error("uploadFile: error: " + e);
+            log.error("uploadFile: error while upload file: " + e);
             throw new RuntimeException("Error upload file");
         }
     }
 
     public byte[] downloadFile(String token, String filename) {
         String login = getLoginByToken(token);
+        log.info("downloadFile: for login: {}", login);
 
         if (filename.isBlank()) {
+            log.error("downloadFile: filename is empty");
             throw new InputDataException("Error input data");
         }
 
@@ -90,22 +102,25 @@ public class CloudStoreService {
                 log.error("downloadFile: file {} - data is null", filename);
                 throw new RuntimeException("Error download file");
             }
-            log.error("downloadFile: data: {}", data);
+            //log.debug("downloadFile: data: {}", data);
             return data;
         }
         catch (Exception e) {
-            log.error("downloadFile: error: " + e);
+            log.error("downloadFile: error while download file: " + e);
             throw new RuntimeException("Error download file");
         }
     }
 
     public void renameFile(String token, String currentFileName, FileInfo newFileInfo) {
         String login = getLoginByToken(token);
+        log.info("renameFile: for login: {}", login);
 
         if (currentFileName.isBlank()) {
+            log.error("renameFile: current filename is empty");
             throw new InputDataException("Error input data");
         }
         if (newFileInfo == null || newFileInfo.getName().isBlank()) {
+            log.error("renameFile: new file name is empty");
             throw new InputDataException("Error input data");
         }
 
@@ -113,15 +128,17 @@ public class CloudStoreService {
             cloudStoreRepository.renameFile(login, currentFileName, newFileInfo.getName());
         }
         catch (Exception e) {
-            log.error("renameFile: error: " + e);
+            log.error("renameFile: error while rename file: " + e);
             throw new RuntimeException("Error rename file");
         }
     }
 
     public void deleteFile(String token, String filename) {
         String login = getLoginByToken(token);
+        log.info("deleteFile: for login: {}", login);
 
         if (filename.isBlank()) {
+            log.error("deleteFile: file name is empty");
             throw new InputDataException("Error input data");
         }
 
@@ -129,7 +146,7 @@ public class CloudStoreService {
             cloudStoreRepository.deleteFile(login, filename);
         }
         catch (Exception e) {
-            log.error("renameFile: error: " + e);
+            log.error("deleteFile: error while delete: " + e);
             throw new RuntimeException("Error delete file");
         }
     }
@@ -137,7 +154,8 @@ public class CloudStoreService {
     private String getLoginByToken(String token) {
         token = getRawToken(token);
 
-        if (!cloudStoreRepository.findToken(token)) {
+        if (!cloudStoreRepository.isFindToken(token)) {
+            log.info("getLoginByToken: not found actual token: {}", token);
             throw new InvalidCredentialsException("Unauthorized error");
         }
         return tokenService.getLogin(token);

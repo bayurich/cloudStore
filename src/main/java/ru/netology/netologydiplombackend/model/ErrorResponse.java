@@ -8,6 +8,9 @@ public class ErrorResponse {
     @JsonProperty(value = "id")
     private int id;
 
+    public ErrorResponse() {
+    }
+
     public ErrorResponse(String message, int id) {
         this.message = message;
         this.id = id;

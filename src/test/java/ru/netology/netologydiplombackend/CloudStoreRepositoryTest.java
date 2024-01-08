@@ -2,7 +2,6 @@ package ru.netology.netologydiplombackend;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.dao.DataAccessException;
@@ -101,10 +100,10 @@ public class CloudStoreRepositoryTest {
         Mockito.when(mockJdbcTemplate.queryForObject(Mockito.anyString(), Mockito.eq(Integer.class), Mockito.eq("token"))).thenReturn(1);
         Mockito.when(mockJdbcTemplate.queryForObject(Mockito.anyString(), Mockito.eq(Integer.class), Mockito.startsWith("wrong"))).thenReturn(0);
 
-        boolean actualResult = cloudStoreRepository.findToken("token");
+        boolean actualResult = cloudStoreRepository.isFindToken("token");
         assertTrue(actualResult);
 
-        actualResult = cloudStoreRepository.findToken("wrong_token");
+        actualResult = cloudStoreRepository.isFindToken("wrong_token");
         assertFalse(actualResult);
     }
 
@@ -114,7 +113,7 @@ public class CloudStoreRepositoryTest {
         Mockito.when(mockJdbcTemplate.queryForObject(Mockito.anyString(), Mockito.eq(Integer.class), Mockito.eq("token"))).thenThrow(new DataAccessException("SQL_SELECT_COUNT_TOKEN Error"){});
 
         DataAccessException dataAccessException = assertThrows(DataAccessException.class, () -> {
-            cloudStoreRepository.findToken("token");
+            cloudStoreRepository.isFindToken("token");
         });
         assertEquals("SQL_SELECT_COUNT_TOKEN Error", dataAccessException.getMessage());
     }

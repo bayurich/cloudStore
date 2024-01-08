@@ -11,7 +11,7 @@ import ru.netology.netologydiplombackend.model.ErrorResponse;
 @RestControllerAdvice
 public class CommonExceptionHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CommonExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonExceptionHandler.class);
 
     @ExceptionHandler(InputDataException.class)
     public ResponseEntity<ErrorResponse> inputDataHandler(InputDataException e) {
@@ -30,7 +30,8 @@ public class CommonExceptionHandler {
 
 
     private ResponseEntity<ErrorResponse> getResponseEntity(Exception e, HttpStatus status) {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!! error: " + e);
+        log.error("getResponseEntity: status: {} {} with error: {}", status, status.value(), e);
+
         return new ResponseEntity<>(new ErrorResponse(e.getMessage(), status.value()), status);
     }
 }
